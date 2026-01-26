@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Topic Selection</title>
+</head>
+<body>
+  <h2>Topic Assignment Form</h2>
+
+  <input id="name" placeholder="Name"><br><br>
+  <input id="className" placeholder="Class"><br><br>
+  <input id="division" placeholder="Division"><br><br>
+  <input id="roll" placeholder="Roll No"><br><br>
+
+  <select id="topic">
+    <option>Select Topic</option>
+    <option>Day-1: Say no to single-use items</option>
+    <option>Day-2: Avoid online shopping</option>
+    <!-- add all topics here -->
+  </select><br><br>
+
+  <select id="groupType">
+    <option>Solo</option>
+    <option>Group</option>
+  </select><br><br>
+
+  <button onclick="submitForm()">Submit</button>
+
+  <p id="result"></p>
+
+<script>
+function submitForm() {
+  const data = {
+    name: document.getElementById("name").value,
+    className: document.getElementById("className").value,
+    division: document.getElementById("division").value,
+    roll: document.getElementById("roll").value,
+    topic: document.getElementById("topic").value,
+    groupType: document.getElementById("groupType").value
+  };
+
+  fetch("PASTE_YOUR_SCRIPT_URL_HERE", {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.status === "success") {
+      document.getElementById("result").innerText =
+        "✅ Topic assigned successfully!";
+    } else if (res.status === "taken") {
+      document.getElementById("result").innerText =
+        "❌ Topic already taken!";
+    } else {
+      document.getElementById("result").innerText =
+        "⚠️ Error occurred!";
+    }
+  });
+}
+</script>
+</body>
+</html>
