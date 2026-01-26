@@ -38,7 +38,7 @@ function submitForm() {
     groupType: document.getElementById("groupType").value
   };
 
-  fetch("PASTE_YOUR_SCRIPT_URL_HERE", {
+  fetch("https://script.google.com/macros/s/AKfycbz85hsbVVTITBVQty6MxrF8ZJ9wQu_4-WxOGRu_x-7o3Vs53UTR0qnHJnJPHuqN7fu6/exec", {
     method: "POST",
     body: JSON.stringify(data)
   })
