@@ -198,6 +198,18 @@
   // 2. Handle Form Submission
   form.addEventListener("submit", function(e) {
     e.preventDefault();
+
+    // --- NEW LOGIC: CHECK FOR FY ---
+    const classInput = document.getElementById("className").value.trim().toUpperCase();
+    
+    // If the class does NOT start with "FY", show error and stop.
+    if (!classInput.startsWith("FY")) {
+        statusDiv.style.display = "block";
+        statusDiv.className = "error";
+        statusDiv.innerText = "⚠️ only FY (First Year) students are allowed to select topics right now.";
+        return; // Stops the function here, does not send data
+    }
+    // --------------------------------
     
     // UI Loading State
     submitBtn.disabled = true;
