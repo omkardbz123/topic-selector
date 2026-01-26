@@ -1,61 +1,250 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Topic Selection</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Topic Assignment</title>
+  <style>
+    /* Modern Reset and Variables */
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+      --border: #d1d5db;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    
+    body {
+      background-color: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Card Container */
+    .container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 500px;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    h2 { text-align: center; color: var(--text); margin-bottom: 1.5rem; }
+    
+    /* Form Elements */
+    .form-group { margin-bottom: 1rem; }
+    
+    label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4b5563; }
+    
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    /* Button */
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover { background-color: var(--primary-hover); }
+    
+    button:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    /* Status Messages */
+    #status {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 6px;
+      text-align: center;
+      display: none;
+    }
+    .success { background-color: #d1fae5; color: #065f46; }
+    .error { background-color: #fee2e2; color: #991b1b; }
+
+    /* Loading Spinner */
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top: 3px solid white;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: none;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
-  <h2>Topic Assignment Form</h2>
 
-  <input id="name" placeholder="Name"><br><br>
-  <input id="className" placeholder="Class"><br><br>
-  <input id="division" placeholder="Division"><br><br>
-  <input id="roll" placeholder="Roll No"><br><br>
+<div class="container">
+  <h2>📝 Topic Selection</h2>
+  
+  <form id="assignmentForm">
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="Ex: Rahul Sharma" required>
+    </div>
 
-  <select id="topic">
-    <option>Select Topic</option>
-    <option>Day-1: Say no to single-use items</option>
-    <option>Day-2: Avoid online shopping</option>
-    <!-- add all topics here -->
-  </select><br><br>
+    <div class="flex-row" style="display: flex; gap: 10px;">
+      <div class="form-group" style="flex: 1;">
+        <label>Class</label>
+        <input type="text" id="className" placeholder="Ex: FY" required>
+      </div>
+      <div class="form-group" style="flex: 1;">
+        <label>Div</label>
+        <input type="text" id="division" placeholder="A" required>
+      </div>
+    </div>
 
-  <select id="groupType">
-    <option>Solo</option>
-    <option>Group</option>
-  </select><br><br>
+    <div class="form-group">
+      <label>Roll Number</label>
+      <input type="number" id="roll" placeholder="Ex: 45" required>
+    </div>
 
-  <button onclick="submitForm()">Submit</button>
+    <div class="form-group">
+      <label>Group Type</label>
+      <select id="groupType">
+        <option value="Solo">Solo</option>
+        <option value="Group">Group</option>
+      </select>
+    </div>
 
-  <p id="result"></p>
+    <div class="form-group">
+      <label>Choose Topic</label>
+      <select id="topic" required>
+        <option value="">Loading topics...</option>
+      </select>
+    </div>
+
+    <button type="submit" id="submitBtn">
+      <span id="btnText">Confirm Selection</span>
+      <div class="spinner" id="btnSpinner"></div>
+    </button>
+  </form>
+
+  <div id="status"></div>
+</div>
 
 <script>
-function submitForm() {
-  const data = {
-    name: document.getElementById("name").value,
-    className: document.getElementById("className").value,
-    division: document.getElementById("division").value,
-    roll: document.getElementById("roll").value,
-    topic: document.getElementById("topic").value,
-    groupType: document.getElementById("groupType").value
+  // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFxaaIjK4NLuNO3ac5pIGHKPY745Rm44jwkNOJFUmx_USodGltp-XKGbjIJfdwWxq8yg/exec";
+
+  const topicSelect = document.getElementById("topic");
+  const form = document.getElementById("assignmentForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const btnText = document.getElementById("btnText");
+  const btnSpinner = document.getElementById("btnSpinner");
+  const statusDiv = document.getElementById("status");
+
+  // 1. Fetch Topics on Page Load
+  window.onload = function() {
+    fetch(SCRIPT_URL)
+      .then(response => response.json())
+      .then(data => {
+        topicSelect.innerHTML = '<option value="">-- Select a Topic --</option>';
+        
+        if (data.status === "success") {
+          data.data.forEach(t => {
+            const option = document.createElement("option");
+            option.value = t.name;
+            // If taken, disable it and add a visual marker
+            if (t.taken) {
+              option.text = "❌ [TAKEN] " + t.name;
+              option.disabled = true;
+            } else {
+              option.text = "✅ " + t.name;
+            }
+            topicSelect.appendChild(option);
+          });
+        }
+      })
+      .catch(error => {
+        topicSelect.innerHTML = '<option>Error loading topics</option>';
+        console.error("Error:", error);
+      });
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbz85hsbVVTITBVQty6MxrF8ZJ9wQu_4-WxOGRu_x-7o3Vs53UTR0qnHJnJPHuqN7fu6/exec", {
-    method: "POST",
-    body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(res => {
-    if (res.status === "success") {
-      document.getElementById("result").innerText =
-        "✅ Topic assigned successfully!";
-    } else if (res.status === "taken") {
-      document.getElementById("result").innerText =
-        "❌ Topic already taken!";
-    } else {
-      document.getElementById("result").innerText =
-        "⚠️ Error occurred!";
-    }
+  // 2. Handle Form Submission
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    // UI Loading State
+    submitBtn.disabled = true;
+    btnText.style.display = "none";
+    btnSpinner.style.display = "block";
+    statusDiv.style.display = "none";
+
+    const formData = {
+      name: document.getElementById("name").value,
+      className: document.getElementById("className").value,
+      division: document.getElementById("division").value,
+      roll: document.getElementById("roll").value,
+      groupType: document.getElementById("groupType").value,
+      topic: topicSelect.value
+    };
+
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(formData)
+    })
+    .then(res => res.json())
+    .then(response => {
+      statusDiv.style.display = "block";
+      
+      if (response.status === "success") {
+        statusDiv.className = "success";
+        statusDiv.innerText = "🎉 Success! Topic Assigned.";
+        form.reset();
+        // Ideally, reload topics here to update the list
+        setTimeout(() => location.reload(), 2000); 
+      } else {
+        statusDiv.className = "error";
+        statusDiv.innerText = response.message || "Error occurred";
+      }
+    })
+    .catch(error => {
+      statusDiv.style.display = "block";
+      statusDiv.className = "error";
+      statusDiv.innerText = "Network Error. Please try again.";
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      btnText.style.display = "block";
+      btnSpinner.style.display = "none";
+    });
   });
-}
 </script>
+
 </body>
 </html>
