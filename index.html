@@ -14,8 +14,6 @@
       --border: #d1d5db;
       --error-bg: #fee2e2;
       --error-text: #991b1b;
-      --notice-bg: #fff1f2;
-      --notice-text: #be123c;
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -25,46 +23,19 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       min-height: 100vh;
-    }
-
-    /* --- RUNNING NOTICE (Marquee) --- */
-    .ticker-wrap {
-      width: 100%;
-      background-color: var(--notice-bg);
-      color: var(--notice-text);
-      overflow: hidden;
-      height: 40px;
-      line-height: 40px;
-      border-bottom: 1px solid #fecdd3;
-      position: fixed;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .ticker {
-      display: inline-block;
-      white-space: nowrap;
-      animation: ticker 20s linear infinite;
-      font-weight: bold;
-      font-size: 1rem;
-    }
-
-    @keyframes ticker {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
+      padding: 20px;
     }
 
     /* --- MAIN CONTAINER --- */
     .container {
       background: var(--card-bg);
-      width: 90%;
+      width: 100%;
       max-width: 600px;
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      margin-top: 80px; /* Space for ticker */
-      margin-bottom: 40px;
       transition: all 0.3s ease;
     }
 
@@ -191,12 +162,6 @@
 </head>
 <body>
 
-  <div class="ticker-wrap">
-    <div class="ticker">
-      📢 NOTICE: Currently only First Year (FY) students will select the topics. Second and Third year students will select afterwards.
-    </div>
-  </div>
-
   <div class="container">
     <h2>Climate Action Change Club</h2>
     <div class="subtitle">Inauguration Topic Selection</div>
@@ -234,17 +199,17 @@
       </div>
       <div class="row">
         <div class="col">
-          <label>Class (Start with FY)</label>
+          <label>Class (FY/SY/TY)</label>
           <input type="text" id="s1_class" placeholder="Ex: FYBSc" required>
         </div>
         <div class="col">
           <label>Div</label>
-          <input type="text" id="s1_div" placeholder="Ex: E3" required>
+          <input type="text" id="s1_div" placeholder="Ex: A" required>
         </div>
       </div>
       <div class="form-group">
         <label>Roll No</label>
-        <input type="text" id="s1_roll" placeholder="Ex: SE3305" required>
+        <input type="text" id="s1_roll" placeholder="Ex: 101" required>
       </div>
       <div class="form-group">
         <label>Email</label>
@@ -263,17 +228,17 @@
         </div>
         <div class="row">
           <div class="col">
-            <label>Class (Start with FY)</label>
+            <label>Class (FY/SY/TY)</label>
             <input type="text" id="s2_class" placeholder="Ex: FYBSc">
           </div>
           <div class="col">
             <label>Div</label>
-            <input type="text" id="s2_div" placeholder="Ex: I2">
+            <input type="text" id="s2_div" placeholder="Ex: A">
           </div>
         </div>
         <div class="form-group">
           <label>Roll No</label>
-          <input type="text" id="s2_roll" placeholder="Ex: FE1102">
+          <input type="text" id="s2_roll" placeholder="Ex: 102">
         </div>
         <div class="form-group">
           <label>Email</label>
@@ -292,11 +257,11 @@
   </div>
 
 <script>
-  // --- PASTE YOUR WEB APP URL BELOW ---
+  // --- EXISTING WEB APP URL ---
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZvEr7rldiVifxOWXiNOdoLnz2jIm4TvQnh3mVq8PpyWvmJmJQ0iU4jmOjed8qQU9MmQ/exec"; 
 
   const selectionScreen = document.getElementById("selectionScreen");
-  const formScreen = document.getElementById("assignmentForm"); // Form ID matches now
+  const formScreen = document.getElementById("assignmentForm");
   const s2Section = document.getElementById("student2Section");
   const projectTypeInput = document.getElementById("projectType");
   const topicSelect = document.getElementById("topic");
@@ -344,7 +309,7 @@
     } else {
       s2Section.classList.add("hidden");
       s2Inputs.forEach(input => input.removeAttribute("required"));
-      s2Inputs.forEach(input => input.value = ""); // Clear if switching back
+      s2Inputs.forEach(input => input.value = ""); 
     }
   }
 
@@ -360,20 +325,41 @@
     e.preventDefault();
     statusDiv.style.display = "none";
 
-    // Validation for First Year (FY)
+    // --- NEW VALIDATION LOGIC ---
+
+    // Regex for Class: Checks if it starts with FY, SY, or TY (Case Insensitive)
+    const classRegex = /^(FY|SY|TY)/i;
+    // Regex for Phone: Checks for exactly 10 digits
+    const phoneRegex = /^[0-9]{10}$/;
+
+    // Student 1 Validation
     const s1Class = document.getElementById("s1_class").value.toUpperCase();
-    if (!s1Class.startsWith("FY")) {
-      showError("Student 1: Only FY (First Year) students allowed right now.");
+    const s1Phone = document.getElementById("s1_phone").value.trim();
+
+    if (!classRegex.test(s1Class)) {
+      showError("Student 1: Class must start with FY, SY, or TY (e.g., FYBSc).");
+      return;
+    }
+    if (!phoneRegex.test(s1Phone)) {
+      showError("Student 1: Please enter a valid 10-digit phone number.");
       return;
     }
 
+    // Student 2 Validation (if Group)
     if (projectTypeInput.value === "Group") {
       const s2Class = document.getElementById("s2_class").value.toUpperCase();
-      if (!s2Class.startsWith("FY")) {
-        showError("Student 2: Only FY (First Year) students allowed right now.");
+      const s2Phone = document.getElementById("s2_phone").value.trim();
+
+      if (!classRegex.test(s2Class)) {
+        showError("Student 2: Class must start with FY, SY, or TY (e.g., FYBSc).");
+        return;
+      }
+      if (!phoneRegex.test(s2Phone)) {
+        showError("Student 2: Please enter a valid 10-digit phone number.");
         return;
       }
     }
+    // ---------------------------
 
     // Submit Animation
     submitBtn.disabled = true;
