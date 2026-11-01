@@ -47,7 +47,6 @@ footer{border-top:1px solid var(--line);padding:22px;text-align:center;color:var
 <label for="city">City and state</label>
 <input id="city" autocomplete="address-level2" placeholder="e.g. Pune, Maharashtra" maxlength="100">
 <div class="actions">
-<button class="primary" id="gmail">Continue with Gmail ↗</button>
 <button class="secondary" id="email">Open default email app ↗</button>
 <button class="secondary" id="copy">Copy the complete email</button>
 </div>
@@ -137,9 +136,7 @@ ${document.getElementById("name").value.trim() || "[Your Name]"}
 ${document.getElementById("city").value.trim() || "[City, State]"}`;
 document.getElementById("preview").textContent=letter.replace("[Your Name]","[Name]").replace("[City, State]","[City, state]");
 function personalized(){return letter}
-function openGmail(){const url="https://mail.google.com/mail/?view=cm&fs=1&to="+encodeURIComponent(to.join(","))+"&cc="+encodeURIComponent(cc.join(","))+"&su="+encodeURIComponent(subject)+"&body="+encodeURIComponent(personalized());window.open(url,"_blank","noopener")}
 function openMail(){window.location.href="mailto:"+to.join(",")+"?cc="+encodeURIComponent(cc.join(","))+"&subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(personalized())}
-document.getElementById("gmail").addEventListener("click",openGmail);
 document.getElementById("email").addEventListener("click",openMail);
 document.getElementById("copy").addEventListener("click",async()=>{const full="To: "+to.join(", ")+"\nCC: "+cc.join(", ")+"\nSubject: "+subject+"\n\n"+personalized();try{await navigator.clipboard.writeText(full);document.getElementById("copy").textContent="Copied! Paste into your email ✓"}catch(e){const t=document.createElement("textarea");t.value=full;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();document.getElementById("copy").textContent="Copied! Paste into your email ✓"}});
 </script>
